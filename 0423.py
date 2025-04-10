@@ -288,24 +288,23 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
 
             .page {{
                 background-color: white;
-                width: 21cm;
-                min-height: 29.7cm;
                 margin: 10px auto;
                 padding: 2cm;
                 position: relative;
                 box-sizing: border-box;
+                border: 1px solid #000;
             }}
             
             .page-content {{
                 position: relative;
                 z-index: 2;
-                padding: 1cm;
+                padding: 0.5cm;
             }}
             
             .student-info {{
                 text-align: center;
                 font-size: 18px;
-                margin-bottom: 20px;
+                margin-bottom: 40px;
             }}
             
             .header {{
