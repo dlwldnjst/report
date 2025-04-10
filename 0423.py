@@ -56,11 +56,16 @@ def calculate_percentile_by_grade(loan_count, grade):
 
     dist = loan_distributions[grade]
     total_students = 300
-    # loan_count 이상 읽은 학생 수의 합
-    at_or_above = sum(count for loan, count in dist.items() if int(loan) > loan_count or int(loan) == loan_count)
-    # 혹시라도 합산 수가 전체 학생 수를 넘으면 300으로 제한합니다.
-    at_or_above = min(at_or_above, total_students)
-    percentile = (at_or_above / total_students) * 100
+    
+    # loan_count보다 더 많이 읽은 학생 수
+    students_above = sum(count for loan, count in dist.items() if loan > loan_count)
+    
+    # loan_count와 동일하게 읽은 학생 수
+    students_equal = sum(count for loan, count in dist.items() if loan == loan_count)
+    
+    # 중간 순위 계산 (동점자는 중간 순위 사용)
+    percentile = 100 * (1 - (students_above + students_equal/2) / total_students)
+    
     return f"{loan_count}권은 {grade}학년 전체에서 상위 {percentile:.1f}% 입니다."
 
 # 청구기호에서 KDC 대분류 추출 함수
@@ -142,7 +147,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
             st.error(f"퍼센타일 계산 중 오류: {e}")
             percentile_text = "계산 불가"
     
-    # HTML 템플릿 생성 - 분야별 통계를 제거하고 가장 많이 읽은 분야만 표시
+    # HTML 템플릿 생성 - A4 페이지 레이아웃 및 테두리 개선
     print_html = f"""
     <!DOCTYPE html>
     <html lang="ko">
@@ -157,11 +162,13 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
             /* 전체 문서에 폰트 적용 */
             body, h1, p, div {{
                 font-family: 'Gowun Dodum', sans-serif;
+                margin: 0;
+                padding: 0;
             }}
             
             @media print {{
-                body, h1, p, div {{
-                    font-family: 'Gowun Dodum', sans-serif !important;
+                body {{
+                    background-color: white;
                 }}
                 
                 .book-item {{
@@ -176,26 +183,6 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 .print-button {{
                     display: none;
                 }}
-                
-                .page-wrapper::before {{
-                    content: "";
-                    position: fixed;
-                    top: 1cm;
-                    left: 1cm;
-                    width: calc(100% - 2cm);
-                    height: calc(100% - 2cm);
-                    border: 2px solid black;
-                    box-sizing: border-box;
-                    z-index: -1;
-                }}
-            }}
-            
-            .page-wrapper {{
-                position: relative;
-                min-height: 100vh;
-                box-sizing: border-box;
-                padding: 2.5cm 2cm;
-                page-break-after: always;
             }}
             
             .book-item {{
@@ -207,6 +194,8 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
             .book-item img {{
                 width: 70px;
                 height: auto;
+                max-height: 100px;
+                object-fit: contain;
             }}
             
             .book-item p {{
@@ -218,6 +207,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 line-height: 1.4em;
                 max-height: 6em;
                 font-size: 0.8em;
+                margin-top: 4px;
             }}
             
             .print-button {{
@@ -229,64 +219,89 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 cursor: pointer;
                 font-size: 16px;
                 margin: 20px 0;
+                display: block;
             }}
             
             .book-grid {{
                 display: grid;
                 grid-template-columns: repeat(5, 1fr);
-                margin: 10px 5px;
                 gap: 10px;
-                page-break-before: avoid;
+                margin: 0 auto;
+                max-width: 100%;
             }}
 
-            .page-wrapper {{
-                position: relative;
-                min-height: 100vh;
+            .container {{
+                max-width: 21cm;
+                margin: 0 auto;
+                padding: 20px;
                 box-sizing: border-box;
-                padding: 2cm 1.5cm 2cm 1.5cm;
-                page-break-after: always;
-                border: 2px solid black;
+                position: relative;
             }}
 
-            @media print {{
-                .page-wrapper {{
-                    padding-top: 2cm;
-                }}
+            .page {{
+                background-color: white;
+                width: 21cm;
+                min-height: 29.7cm;
+                margin: 10px auto;
+                padding: 2cm;
+                position: relative;
+                box-sizing: border-box;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            }}
+            
+            .page-border {{
+                position: absolute;
+                top: 1cm;
+                left: 1cm;
+                right: 1cm;
+                bottom: 1cm;
+                border: 2px solid black;
+                pointer-events: none;
+                z-index: 1;
+            }}
+            
+            .page-content {{
+                position: relative;
+                z-index: 2;
+                padding: 1cm;
             }}
             
             .student-info {{
                 text-align: center;
                 font-size: 18px;
                 margin-bottom: 20px;
-                page-break-after: avoid;
             }}
             
             .header {{
                 text-align: center;
                 font-size: 30px;
-                margin-bottom: 6px;
+                margin-bottom: 30px;
             }}
             
             .header h1 {{
-                margin-top: 0.5em;
+                margin-top: 0;
+                font-size: 28px;
             }}
         </style>
     </head>
     <body>
-        <div class="page-wrapper">
-            <div class="header">
-                <h1>{student_name}의 독서 기록</h1>
-            </div>
-            
-            <div class="student-info">
-                <p>{student_name} 학생은 덕이고에서 {total_books}권의 책을 읽었습니다 📚</p>
-                <p>{student_name} 학생의 독서 기록은 상위 {percentile_text}입니다 🏅</p>
-                <p>{student_name} 학생이 <strong>가장 많이 읽은 분야는 {most_read_category}입니다 📖</strong></p><br>
-            </div>
-            
+        <div class="container">
             <button class="print-button" onclick="printPage()">인쇄하기</button>
             
-            <div class="book-grid">
+            <div class="page">
+                <div class="page-border"></div>
+                <div class="page-content">
+                    <div class="header">
+                        <h1>{student_name}의 독서 기록</h1>
+                    </div>
+                    
+                    <div class="student-info">
+                        <p>{student_name} 학생은 덕이고에서 {total_books}권의 책을 읽었습니다 📚</p>
+                        <p>{student_name} 학생의 독서 기록은 상위 {percentile_text}입니다 🏅</p>
+                        <p>{student_name} 학생이 <strong>가장 많이 읽은 분야는 {most_read_category}입니다 📖</strong></p>
+                    </div>
+                    
+                    <div class="book-grid">
     """
 
     for idx, row in df_merged.iterrows():
@@ -295,7 +310,6 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
         date_raw = row.get('대출일') or '정보 없음'
         date = date_raw + '.' if date_raw != '정보 없음' else date_raw
         
-        # 개별 도서에서도 분야 정보 제거
         print_html += f"""
         <div class="book-item">
             <img src="{thumbnail}" alt="{title}">
@@ -304,6 +318,8 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
         """
 
     print_html += """
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -311,8 +327,6 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
         // 폰트 로딩 확인
         document.fonts.ready.then(function() {
             console.log('모든 폰트가 로드되었습니다.');
-            
-            // 필요시 폰트 로딩 완료 후 특정 작업 수행
             document.body.classList.add('fonts-loaded');
         });
         
