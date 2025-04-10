@@ -221,24 +221,16 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
 
             .page-wrapper {{
                 position: relative;
-                height: 100vh;
+                min-height: 100vh;
                 box-sizing: border-box;
-                padding: 1.5cm;
+                padding: 2cm 1.5cm 2cm 1.5cm;
                 page-break-after: always;
+                border: 2px solid black;
             }}
 
             @media print {{
-                .page-wrapper::before {{
-                    content: "";
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100vw;
-                    height: 100vh;
-                    box-sizing: border-box;
-                    border: 2px solid black;
-                    pointer-events: none;
-                    z-index: -1;
+                .page-wrapper {{
+                    padding-top: 2cm;
                 }}
             }}
             
