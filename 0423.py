@@ -58,10 +58,10 @@ def calculate_percentile_by_grade(loan_count, grade):
     total_students = 300
     
     # loan_count보다 더 많이 읽은 학생 수
-    students_above = sum(count for loan, count in dist.items() if loan > loan_count)
+    students_above = sum(count for loan, count in dist.items() if int(loan) > int(loan_count))
     
     # loan_count와 동일하게 읽은 학생 수
-    students_equal = sum(count for loan, count in dist.items() if loan == loan_count)
+    students_equal = sum(count for loan, count in dist.items() if int(loan) == int(loan_count))
     
     # 중간 순위 계산 (동점자는 중간 순위 사용)
     percentile = 100 * (1 - (students_above + students_equal/2) / total_students)
