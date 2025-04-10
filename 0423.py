@@ -274,24 +274,24 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 display: grid;
                 grid-template-columns: repeat(5, 1fr);
                 gap: 10px;
-                margin: 0 auto;
-                max-width: 100%;
+                width: 100%;
+                box-sizing: border-box;
+                overflow: hidden;
             }}
 
             .container {{
+                width: 100%;
                 max-width: 21cm;
                 margin: 0 auto;
-                padding: 20px;
+                padding: 0px;
                 box-sizing: border-box;
-                position: relative;
             }}
 
             .page {{
-                background-color: white;
-                margin: 10px auto;
-                padding: 2cm;
-                position: relative;
+                width: 100%;
                 box-sizing: border-box;
+                padding: 0;
+                margin: 0;
             }}
             
             .page-content {{
@@ -321,13 +321,6 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 margin-bottom: 10px;
             }}
             
-            .full-page {{
-                width: 21cm;
-                min-height: 29.7cm;
-                border: 1px solid #000;
-                margin: 10px auto;
-                box-sizing: border-box;
-            }}
        </style>
 
     </head>
@@ -335,7 +328,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
         <div class="container">
             <button class="print-button" onclick="printPage()">인쇄하기</button>
             
-            <div class="full-page">
+            <div class="page">
                 <div class="page">
                 <!-- <div class="page-border"></div> -->
                 <div class="page-content">
