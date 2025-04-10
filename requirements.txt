@@ -3,3 +3,6 @@ pandas
 requests
 xlrd
 openpyxl
+re
+unquote
+Counter
