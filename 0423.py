@@ -292,7 +292,6 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 padding: 2cm;
                 position: relative;
                 box-sizing: border-box;
-                border: 1px solid #000;
             }}
             
             .page-content {{
@@ -321,6 +320,14 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
             .student-info p {{
                 margin-bottom: 10px;
             }}
+            
+            .full-page {{
+                width: 21cm;
+                height: 29.7cm;
+                border: 1px solid #000;
+                margin: 10px auto;
+                box-sizing: border-box;
+            }}
        </style>
 
     </head>
@@ -328,7 +335,8 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
         <div class="container">
             <button class="print-button" onclick="printPage()">인쇄하기</button>
             
-            <div class="page">
+            <div class="full-page">
+                <div class="page">
                 <!-- <div class="page-border"></div> -->
                 <div class="page-content">
                     <div class="header">
@@ -363,6 +371,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 </div>
             </div>
         </div>
+    </div>
         
         <script>
         // 폰트 로딩 확인
