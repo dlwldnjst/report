@@ -294,7 +294,6 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 padding: 2cm;
                 position: relative;
                 box-sizing: border-box;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
             }}
             
             .page-content {{
@@ -319,7 +318,12 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 margin-top: 0;
                 font-size: 28px;
             }}
+
+            .student-info p {{
+                margin-bottom: 10px;
+            }}
        </style>
+
     </head>
     <body>
         <div class="container">
