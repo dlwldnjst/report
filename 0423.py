@@ -155,6 +155,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 @page {{
                     size: A4;
                     margin: 1.5cm;
+                    border: 2px solid black;
                 }}
                 
                 .print-button {{
@@ -176,11 +177,11 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
             .book-item p {{
                 overflow: hidden;
                 display: -webkit-box;
-                -webkit-line-clamp: 3;
+                -webkit-line-clamp: 4;
                 -webkit-box-orient: vertical;
                 text-overflow: ellipsis;
                 line-height: 1.4em;
-                max-height: 4.2em;
+                max-height: 6em;
                 font-size: 0.8em;
             }}
             
@@ -204,16 +205,10 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
             }}
 
             .page-wrapper {{
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                width: 100%;
-                height: 100%;
                 box-sizing: border-box;
                 padding: 1.5cm;
                 border: 2px solid black;
+                page-break-after: always;
             }}
             
             .student-info {{
@@ -300,8 +295,12 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
 st.title("독서 기록 ISBN 조회 및 썸네일 표시")
 
 st.markdown("### Kakao API 설정")
-api_key = st.secrets["kakao"]["api_key"]
-api_url = st.secrets["kakao"].get("api_url", "https://dapi.kakao.com/v3/search/book")
+api_key = st.text_input("Kakao API Key", type="password", help="Kakao Developers에서 발급받은 REST API 키")
+api_url = st.text_input("Kakao API URL", value="https://dapi.kakao.com/v3/search/book")
+
+if not api_key:
+    st.warning("Kakao API Key를 입력하세요.")
+    st.stop()
 
 headers = {"Authorization": f"KakaoAK {api_key}"}
 
