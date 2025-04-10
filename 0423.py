@@ -38,6 +38,9 @@ KDC_CATEGORIES = {
 }
 
 def calculate_percentile_by_grade(loan_count, grade):
+    # 디버깅용 로그 추가
+    st.write(f"입력값: loan_count={loan_count}, grade={grade}, 타입: {type(loan_count)}, {type(grade)}")
+    
     # 각 학년별 분포 데이터 (전교생 300명 기준으로 정규화)
     loan_distributions = {
         1: {5: 1, 3: 1, 2: 4, 1: 10, 0: 284},
@@ -66,7 +69,10 @@ def calculate_percentile_by_grade(loan_count, grade):
     # 중간 순위 계산 (동점자는 중간 순위 사용)
     percentile = 100 * (1 - (students_above + students_equal/2) / total_students)
     
-    return f"{loan_count}권은 {grade}학년 전체에서 상위 {percentile:.1f}% 입니다."
+    # 결과 로깅
+    result = f"{loan_count}권은 {grade}학년 전체에서 상위 {percentile:.1f}% 입니다."
+    st.write(f"계산 결과: {result}")
+    return result
 
 # 청구기호에서 KDC 대분류 추출 함수
 def extract_kdc_category(call_number):
@@ -141,8 +147,18 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
     percentile_text = "?"
     if grade and isinstance(total_books, int):
         try:
-            text = calculate_percentile_by_grade(total_books, grade)
-            percentile_text = text.split("상위 ")[-1].split(" 입니다.")[0]
+            # 전체 텍스트를 그대로 사용
+            full_text = calculate_percentile_by_grade(total_books, grade)
+            # 디버깅을 위해 로그 추가
+            st.write(f"계산된 텍스트: {full_text}")
+            
+            # 정규식으로 숫자 추출 (더 안정적인 방법)
+            import re
+            match = re.search(r"상위\s+([\d\.]+)%", full_text)
+            if match:
+                percentile_text = match.group(1) + "%"
+            else:
+                percentile_text = full_text  # 패턴 못 찾으면 전체 텍스트 사용
         except Exception as e:
             st.error(f"퍼센타일 계산 중 오류: {e}")
             percentile_text = "계산 불가"
