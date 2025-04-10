@@ -297,17 +297,6 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 box-shadow: 0 0 10px rgba(0,0,0,0.1);
             }}
             
-            /* .page-border {
-                position: absolute;
-                top: 1cm;
-                left: 1cm;
-                right: 1cm;
-                bottom: 1cm;
-                border: 2px solid black;
-                pointer-events: none;
-                z-index: 1;
-            } */
-            
             .page-content {{
                 position: relative;
                 z-index: 2;
