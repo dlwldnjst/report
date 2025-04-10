@@ -177,7 +177,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 students_equal = sum(count for loan, count in dist.items() if int(loan) == loan_count_int)
                 
                 # 퍼센타일 계산 (동점자는 중간 순위 사용)
-                percentile = 100 * (1 - (students_above + students_equal/2) / total_students)
+                percentile = (students_above + students_equal/2) / total_students * 100
                 
                 percentile_text = f"{percentile:.1f}%"
                 st.write(f"계산된 퍼센타일: {percentile_text}")
@@ -350,6 +350,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                     </div>
     """
 
+    print_html += '<div class="book-grid">'
     # 책 목록 추가
     for idx, row in df_merged.iterrows():
         thumbnail = row.get('thumbnail', 'https://via.placeholder.com/100x150.png?text=No+Image')
