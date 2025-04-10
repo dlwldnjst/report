@@ -297,7 +297,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 box-shadow: 0 0 10px rgba(0,0,0,0.1);
             }}
             
-            .page-border {{
+            /* .page-border {
                 position: absolute;
                 top: 1cm;
                 left: 1cm;
@@ -306,7 +306,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 border: 2px solid black;
                 pointer-events: none;
                 z-index: 1;
-            }}
+            } */
             
             .page-content {{
                 position: relative;
@@ -337,7 +337,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
             <button class="print-button" onclick="printPage()">인쇄하기</button>
             
             <div class="page">
-                <div class="page-border"></div>
+                <!-- <div class="page-border"></div> -->
                 <div class="page-content">
                     <div class="header">
                         <h1>{student_name}의 독서 기록</h1>
