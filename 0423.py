@@ -143,25 +143,57 @@ def fetch_book_thumbnail(isbn_val, headers, api_url):
         return None, f"ISBN({isbn}) 처리 중 예외 발생: {e}"
 
 def generate_print_view(df_merged, student_name, total_books, grade=None, most_read_category="정보 없음", category_stats=None):
-    # 퍼센타일 계산 - 미리 계산하여 HTML 문자열에 직접 삽입
+    # 디버깅을 위한 출력
+    st.write(f"print_view 호출됨: total_books={total_books}, grade={grade}")
+    
+    # 직접 퍼센타일 계산
     percentile_text = "?"
+    
     if grade and isinstance(total_books, int):
         try:
-            # 전체 텍스트를 그대로 사용
-            full_text = calculate_percentile_by_grade(total_books, grade)
-            # 디버깅을 위해 로그 추가
-            st.write(f"계산된 텍스트: {full_text}")
+            # 각 학년별 분포 데이터 (전교생 300명 기준으로 정규화)
+            loan_distributions = {
+                1: {5: 1, 3: 1, 2: 4, 1: 10, 0: 284},
+                2: {
+                    104: 1, 43: 1, 40: 1, 20: 1, 18: 1, 16: 2, 15: 1, 12: 3, 11: 3,
+                    10: 6, 9: 8, 8: 6, 7: 7, 6: 15, 5: 18, 4: 20, 3: 32, 2: 47, 1: 66, 0: 61
+                },
+                3: {
+                    63: 1, 42: 1, 22: 2, 18: 1, 16: 1, 15: 1, 13: 3, 12: 1, 11: 2,
+                    10: 2, 9: 5, 8: 4, 7: 5, 6: 5, 5: 6, 4: 12, 3: 21, 2: 40, 1: 80, 0: 107
+                }
+            }
             
-            # 정규식으로 숫자 추출 (더 안정적인 방법)
-            import re
-            match = re.search(r"상위\s+([\d\.]+)%", full_text)
-            if match:
-                percentile_text = match.group(1) + "%"
+            if grade in loan_distributions:
+                dist = loan_distributions[grade]
+                total_students = 300
+                
+                # 값 변환 문제 방지
+                loan_count_int = int(total_books)
+                
+                # loan_count보다 더 많이 읽은 학생 수
+                students_above = sum(count for loan, count in dist.items() if int(loan) > loan_count_int)
+                
+                # loan_count와 동일하게 읽은 학생 수
+                students_equal = sum(count for loan, count in dist.items() if int(loan) == loan_count_int)
+                
+                # 중간 순위 계산 (동점자는 중간 순위 사용)
+                percentile = 100 * (1 - (students_above + students_equal/2) / total_students)
+                
+                # 결과 직접 설정
+                percentile_text = f"{percentile:.1f}%"
+                
+                # 디버깅 출력
+                st.write(f"계산된 퍼센타일: {percentile_text}")
             else:
-                percentile_text = full_text  # 패턴 못 찾으면 전체 텍스트 사용
+                st.write(f"{grade}학년 데이터가 없습니다.")
+                percentile_text = "계산 불가"
+                
         except Exception as e:
-            st.error(f"퍼센타일 계산 중 오류: {e}")
+            st.error(f"퍼센타일 계산 중 오류가 발생했습니다: {e}")
             percentile_text = "계산 불가"
+            import traceback
+            st.error(traceback.format_exc())  # 자세한 오류 추적 정보 출력
     
     # HTML 템플릿 생성 - A4 페이지 레이아웃 및 테두리 개선
     print_html = f"""
