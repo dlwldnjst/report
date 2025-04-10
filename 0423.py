@@ -300,12 +300,8 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
 st.title("독서 기록 ISBN 조회 및 썸네일 표시")
 
 st.markdown("### Kakao API 설정")
-api_key = st.text_input("Kakao API Key", type="password", help="Kakao Developers에서 발급받은 REST API 키")
-api_url = st.text_input("Kakao API URL", value="https://dapi.kakao.com/v3/search/book")
-
-if not api_key:
-    st.warning("Kakao API Key를 입력하세요.")
-    st.stop()
+api_key = st.secrets["kakao"]["api_key"]
+api_url = st.secrets["kakao"].get("api_url", "https://dapi.kakao.com/v3/search/book")
 
 headers = {"Authorization": f"KakaoAK {api_key}"}
 
