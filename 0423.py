@@ -223,13 +223,10 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                     page-break-inside: avoid;
                 }}
                 
-                @page :first {{
-                    size: A4;
-                    margin: 2cm;
-                }}
                 @page {{
                 size: A4;
-                margin: 3cm 2cm 2cm 2cm;
+                margin: 2cm;
+                }}
                 
                 .print-button {{
                     display: none;
@@ -326,7 +323,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
             
             .full-page {{
                 width: 21cm;
-                height: 29.7cm;
+                min-height: 29.7cm;
                 border: 1px solid #000;
                 margin: 10px auto;
                 box-sizing: border-box;
