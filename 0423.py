@@ -7,6 +7,22 @@ from urllib.parse import unquote
 from html import escape
 from collections import Counter
 
+@st.cache_data(show_spinner=False)
+def fetch_all_thumbnails(df_merged, headers, api_url):
+    df = df_merged.copy()
+    thumbnail_cache = {}
+    for idx, row in df.iterrows():
+        isbn_val = row.get('ISBN')
+        if isbn_val in thumbnail_cache:
+            thumbnail_url = thumbnail_cache[isbn_val]
+        else:
+            book_info, error = fetch_book_thumbnail(isbn_val, headers, api_url)
+            thumbnail_url = book_info.get('thumbnail') if book_info else None
+            thumbnail_cache[isbn_val] = thumbnail_url
+        if thumbnail_url:
+            df.at[idx, 'thumbnail'] = thumbnail_url
+    return df
+
 # KDC 대분류 매핑 사전 추가
 KDC_CATEGORIES = {
     '0': '총류',
@@ -357,36 +373,15 @@ if main_file is not None and mapping_file is not None:
         # -------------------------
         df_merged = pd.merge(df_main, df_mapping, on='등록번호', how='left')
         df_merged['thumbnail'] = None
-        thumbnail_cache = {}
 
         # -------------------------
         # (5) 독서 분야 분석
         # -------------------------
         most_read_category, category_stats = find_most_read_category(df_merged)
 
-        processed_count = 0
-        total_rows = len(df_merged)
-        progress_bar = st.progress(0)
-        status_text = st.empty()
+        df_merged = fetch_all_thumbnails(df_merged, headers, api_url)
+        processed_count = df_merged['thumbnail'].notna().sum()
 
-        for idx, row in df_merged.iterrows():
-            isbn_val = row.get('ISBN')
-            if isbn_val in thumbnail_cache:
-                thumbnail_url = thumbnail_cache[isbn_val]
-                error = None
-            else:
-                book_info, error = fetch_book_thumbnail(isbn_val, headers, api_url)
-                thumbnail_url = book_info.get('thumbnail') if book_info else None
-                thumbnail_cache[isbn_val] = thumbnail_url
-
-            if thumbnail_url:
-                df_merged.at[idx, 'thumbnail'] = thumbnail_url
-
-            processed_count += 1
-            progress_bar.progress((idx + 1) / total_rows)
-            status_text.text(f"처리 중... ({idx + 1}/{total_rows})")
-
-        status_text.text(f"총 {processed_count}건의 등록번호 처리가 완료되었습니다.")
         st.success(f"🎉 총 {processed_count}건 처리 완료! 🎉")
 
         # -------------------------
