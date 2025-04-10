@@ -170,7 +170,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 
                 @page {{
                     size: A4;
-                    margin: 1.5cm;
+                    margin: 0;
                 }}
                 
                 .print-button {{
@@ -220,10 +220,26 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
             }}
 
             .page-wrapper {{
+                position: relative;
+                height: 100vh;
                 box-sizing: border-box;
                 padding: 1.5cm;
-                border: 2px solid black;
                 page-break-after: always;
+            }}
+
+            @media print {{
+                .page-wrapper::before {{
+                    content: "";
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100vw;
+                    height: 100vh;
+                    box-sizing: border-box;
+                    border: 2px solid black;
+                    pointer-events: none;
+                    z-index: -1;
+                }}
             }}
             
             .student-info {{
