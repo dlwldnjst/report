@@ -364,6 +364,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
         </div>
         """
 
+    print_html += "</div>"  # book-grid 닫기
     print_html += """
                     </div>
                 </div>
