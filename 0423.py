@@ -155,7 +155,6 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 @page {{
                     size: A4;
                     margin: 1.5cm;
-                    border: 2px solid black;
                 }}
                 
                 .print-button {{
