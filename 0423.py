@@ -143,66 +143,56 @@ def fetch_book_thumbnail(isbn_val, headers, api_url):
         return None, f"ISBN({isbn}) 처리 중 예외 발생: {e}"
 
 def generate_print_view(df_merged, student_name, total_books, grade=None, most_read_category="정보 없음", category_stats=None):
-    st.write(f"print_view 호출됨: total_books={total_books}, grade={grade}")
+    st.write(f"print_view 호출됨: total_books={total_books}, grade={grade}, 타입: {type(total_books)}, {type(grade)}")
     
-    # 하드코딩된 퍼센타일 값 계산 (직접 계산)
+    # 퍼센타일 계산
     percentile_text = "정보 없음"
     
-    if grade and isinstance(total_books, int):
+    if grade and total_books is not None:
         try:
-            # 3학년, 21권일 경우 퍼센타일 직접 계산
-            if grade == 3 and total_books == 21:
-                percentile_text = "18.5%"  # 이미 알고 있는 정확한 값
-                st.write("3학년 21권 - 하드코딩된 퍼센타일 사용")
-            else:
-                # 각 학년별 분포 데이터
-                loan_distributions = {
-                    1: {5: 1, 3: 1, 2: 4, 1: 10, 0: 284},
-                    2: {
-                        104: 1, 43: 1, 40: 1, 20: 1, 18: 1, 16: 2, 15: 1, 12: 3, 11: 3,
-                        10: 6, 9: 8, 8: 6, 7: 7, 6: 15, 5: 18, 4: 20, 3: 32, 2: 47, 1: 66, 0: 61
-                    },
-                    3: {
-                        63: 1, 42: 1, 22: 2, 18: 1, 16: 1, 15: 1, 13: 3, 12: 1, 11: 2,
-                        10: 2, 9: 5, 8: 4, 7: 5, 6: 5, 5: 6, 4: 12, 3: 21, 2: 40, 1: 80, 0: 107
-                    }
+            # total_books를 정수로 확실하게 변환
+            loan_count_int = int(total_books)
+            
+            # 각 학년별 분포 데이터
+            loan_distributions = {
+                1: {5: 1, 3: 1, 2: 4, 1: 10, 0: 284},
+                2: {
+                    104: 1, 43: 1, 40: 1, 20: 1, 18: 1, 16: 2, 15: 1, 12: 3, 11: 3,
+                    10: 6, 9: 8, 8: 6, 7: 7, 6: 15, 5: 18, 4: 20, 3: 32, 2: 47, 1: 66, 0: 61
+                },
+                3: {
+                    63: 1, 42: 1, 22: 2, 18: 1, 16: 1, 15: 1, 13: 3, 12: 1, 11: 2,
+                    10: 2, 9: 5, 8: 4, 7: 5, 6: 5, 5: 6, 4: 12, 3: 21, 2: 40, 1: 80, 0: 107
                 }
+            }
+            
+            if grade in loan_distributions:
+                dist = loan_distributions[grade]
+                total_students = sum(dist.values())  # 실제 총 학생 수 계산
                 
-                if grade in loan_distributions:
-                    dist = loan_distributions[grade]
-                    total_students = 300
-                    
-                    # total_books를 정수로 변환
-                    loan_count_int = int(total_books)
-                    
-                    # 책 수보다 더 많이 읽은 학생 수
-                    students_above = 0
-                    for loan, count in dist.items():
-                        if int(loan) > loan_count_int:
-                            students_above += count
-                    
-                    # 동일한 책 수를 읽은 학생 수
-                    students_equal = 0
-                    for loan, count in dist.items():
-                        if int(loan) == loan_count_int:
-                            students_equal += count
-                    
-                    # 퍼센타일 계산 (동점자는 중간 순위 사용)
-                    percentile = 100 * (1 - (students_above + students_equal/2) / total_students)
-                    
-                    percentile_text = f"{percentile:.1f}%"
-                    st.write(f"계산된 퍼센타일: {percentile_text}")
-                    st.write(f"위 학생: {students_above}, 같은 권수: {students_equal}, 총 학생: {total_students}")
-                else:
-                    st.write(f"{grade}학년 데이터가 없습니다.")
-                    percentile_text = "계산 불가"
+                # 책 수보다 더 많이 읽은 학생 수
+                students_above = sum(count for loan, count in dist.items() if int(loan) > loan_count_int)
+                
+                # 동일한 책 수를 읽은 학생 수
+                students_equal = sum(count for loan, count in dist.items() if int(loan) == loan_count_int)
+                
+                # 퍼센타일 계산 (동점자는 중간 순위 사용)
+                percentile = 100 * (1 - (students_above + students_equal/2) / total_students)
+                
+                percentile_text = f"{percentile:.1f}%"
+                st.write(f"계산된 퍼센타일: {percentile_text}")
+                st.write(f"위 학생: {students_above}, 같은 권수: {students_equal}, 총 학생: {total_students}")
+                st.write(f"계산식: 100 * (1 - ({students_above} + {students_equal}/2) / {total_students})")
+            else:
+                st.write(f"{grade}학년 데이터가 없습니다.")
+                percentile_text = "계산 불가"
         except Exception as e:
             st.error(f"퍼센타일 계산 중 오류: {e}")
             import traceback
             st.error(traceback.format_exc())
-            percentile_text = "계산 불가"
+            percentile_text = "계산 오류"
     
-    # HTML 템플릿에 계산된 값 직접 삽입
+    # 최종 퍼센타일 로깅
     st.write(f"최종 퍼센타일 텍스트: '{percentile_text}'")
     
     # HTML 템플릿 생성
@@ -360,6 +350,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                     </div>
     """
 
+    # 책 목록 추가
     for idx, row in df_merged.iterrows():
         thumbnail = row.get('thumbnail', 'https://via.placeholder.com/100x150.png?text=No+Image')
         title = row.get('제목') or '제목 없음'
