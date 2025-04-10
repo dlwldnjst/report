@@ -223,10 +223,13 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                     page-break-inside: avoid;
                 }}
                 
-                @page {{
+                @page :first {{
                     size: A4;
-                    margin: 0;
+                    margin: 2cm;
                 }}
+                @page {{
+                size: A4;
+                margin: 3cm 2cm 2cm 2cm;
                 
                 .print-button {{
                     display: none;
