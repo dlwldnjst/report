@@ -57,7 +57,7 @@ def calculate_percentile_by_grade(loan_count, grade):
     dist = loan_distributions[grade]
     total_students = 300
     # loan_count 이상 읽은 학생 수의 합
-    at_or_above = sum(count for loan, count in dist.items() if loan >= loan_count)
+    at_or_above = sum(count for loan, count in dist.items() if int(loan) > loan_count or int(loan) == loan_count)
     # 혹시라도 합산 수가 전체 학생 수를 넘으면 300으로 제한합니다.
     at_or_above = min(at_or_above, total_students)
     percentile = (at_or_above / total_students) * 100
@@ -176,6 +176,26 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 .print-button {{
                     display: none;
                 }}
+                
+                .page-wrapper::before {{
+                    content: "";
+                    position: fixed;
+                    top: 1cm;
+                    left: 1cm;
+                    width: calc(100% - 2cm);
+                    height: calc(100% - 2cm);
+                    border: 2px solid black;
+                    box-sizing: border-box;
+                    z-index: -1;
+                }}
+            }}
+            
+            .page-wrapper {{
+                position: relative;
+                min-height: 100vh;
+                box-sizing: border-box;
+                padding: 2.5cm 2cm;
+                page-break-after: always;
             }}
             
             .book-item {{
