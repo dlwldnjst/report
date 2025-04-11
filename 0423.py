@@ -229,7 +229,12 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 }}
                 
                 .print-button {{
-                    display: none;
+                    display: none !important;
+                    visibility: hidden;
+                    height: 0;
+                    width: 0;
+                    margin: 0;
+                    padding: 0;
                 }}
             }}
             
@@ -303,7 +308,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
             .student-info {{
                 text-align: center;
                 font-size: 18px;
-                margin-bottom: 40px;
+                margin-bottom: 50px;
             }}
             
             .header {{
@@ -416,7 +421,7 @@ if main_file is not None and mapping_file is not None:
         # (1) 파일 한번에 읽기
         # -------------------------
         df_all = pd.read_excel(main_file, header=None)
-        text_in_4th_row = df_all.iloc[3, 0]
+        text_in_4th_row = df_all.iloc[2, 0]
 
         pattern_name = r"성명\s*:\s*(.+)"
         match_name = re.search(pattern_name, text_in_4th_row)
