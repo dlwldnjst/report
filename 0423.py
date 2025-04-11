@@ -449,6 +449,7 @@ if main_file is not None and mapping_file is not None:
         df_main['등록번호'] = df_main['등록번호'].astype(str).str.strip()
         df_main = df_main[df_main['등록번호'] != '']
         df_main['대출일'] = pd.to_datetime(df_main['대출일'], errors='coerce').dt.strftime('%Y.%m.%d')
+        df_main.sort_values(by='대출일', ascending=True, inplace=True)
 
         # -------------------------
         # (3) 매핑 파일 처리
