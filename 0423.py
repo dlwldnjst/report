@@ -292,7 +292,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 box-sizing: border-box;
             }}
 
-            .page-border {
+            .page-border {{
                 border: 1px solid black;
                 height: 100%;
                 width: 100%;
@@ -302,7 +302,7 @@ def generate_print_view(df_merged, student_name, total_books, grade=None, most_r
                 box-sizing: border-box;
                 z-index: 1;
                 pointer-events: none;
-            }
+            }}
 
             .page {{
                 width: 100%;
