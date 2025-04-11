@@ -421,13 +421,15 @@ if main_file is not None and mapping_file is not None:
         # (1) 파일 한번에 읽기
         # -------------------------
         df_all = pd.read_excel(main_file, header=None)
-        text_in_4th_row = df_all.iloc[2, 0]
+        import unicodedata
+        text_in_4th_row = unicodedata.normalize("NFKC", df_all.iloc[2, 0]).strip()
+        st.write(f"[디버깅] A3 셀 값: '{text_in_4th_row}'")
 
-        pattern_name = r"성명\s*:\s*(.+)"
+        pattern_name = r"성명\s*[:：]?\s*(.+)"
         match_name = re.search(pattern_name, text_in_4th_row)
         student_name = match_name.group(1).strip() if match_name else "이름 미상"
 
-        pattern_class = r"학년\s*-\s*반\s*-\s*번호\s*:\s*([0-9]+)-([0-9]+)-([0-9]+)"
+        pattern_class = r"([0-9]+)\s*-\s*([0-9]+)\s*-\s*([0-9]+)"
         match_class = re.search(pattern_class, text_in_4th_row)
         class_info = f"{match_class.group(1)}학년 {match_class.group(2)}반 {match_class.group(3)}번" if match_class else "학번 미상"
         grade_detected = int(match_class.group(1)) if match_class else None
